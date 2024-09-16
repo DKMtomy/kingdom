@@ -1,0 +1,29 @@
+{
+  "name": "kingdom",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "description": "",
+  "dependencies": {
+    "@minecraft/server": "^1.15.0-beta.1.21.30-preview.23",
+    "@minecraft/server-ui": "^1.4.0-beta.1.21.30-preview.23",
+    "@minecraft/vanilla-data": "^1.21.20"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "@typescript-eslint/eslint-plugin": "^8.1.0",
+    "@typescript-eslint/parser": "^8.1.0",
+    "eslint": "^9.9.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.9.0",
+    "prettier": "^3.3.3",
+    "typescript-eslint": "^8.1.0"
+  }
+}

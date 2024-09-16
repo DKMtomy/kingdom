@@ -1,0 +1,24 @@
+{
+  "format_version": "1.21.20",
+  "minecraft:block": {
+    "description": {
+      "identifier": "wkd:enter"
+    },
+    "components": {
+      "minecraft:custom_components": ["wkd:enterKingdom"],
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "red_pillar",
+          "render_method": "alpha_test"
+        }
+      },
+      "minecraft:light_emission": 1,
+      "minecraft:destructible_by_mining": false,
+      "minecraft:geometry": "geometry.block",
+      "minecraft:collision_box": {
+        "size": [16, 16, 16],
+        "origin": [-8, 0, -8]
+      }
+    }
+  }
+}
