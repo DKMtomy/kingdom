@@ -16,6 +16,7 @@
     "noImplicitThis": true,
     "alwaysStrict": true,
     "noUnusedLocals": false, // set this to true when we are gonna develop on main pc
+    "experimentalDecorators": true,
     "noUnusedParameters": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,

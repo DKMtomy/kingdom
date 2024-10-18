@@ -189,6 +189,14 @@ class KingdomForm {
         //@ts-expect-error
         messageForm.show(player).then((response) => {
           if (response.selection == 0) this.acceptInvite(new Player(player), invite);
+
+          else {
+            this.#client.kingdomClient
+              .deleteOne('kingdoms', 'invites', { player: player.name, kingdom: invite.kingdom })
+              .then((result) => {
+                this.#client.sendMessage('Uitnodiging geweigerd', player);
+              });
+          }
         });
       });
     });

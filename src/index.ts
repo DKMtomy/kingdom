@@ -100,7 +100,6 @@ world.beforeEvents.chatSend.subscribe((event) => {
   }
 })
 
-
 world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
   if (event.target.typeId !== "minecraft:armor_stand") return;
 

@@ -4,6 +4,7 @@ import { Container, Dimension, EntityEquippableComponent, EntityInventoryCompone
 class Player extends Entity {
   #player: IPlayer;
   #equip: EntityEquippableComponent | undefined;
+  #apiRequest: boolean = false;
 
   constructor(player: IPlayer) {
     super(player);
@@ -14,6 +15,10 @@ class Player extends Entity {
 
   get player(): IPlayer {
     return this.#player;
+  }
+
+  get hasApiRequest(): boolean {
+    return this.#apiRequest;
   }
 
   get nameTag(): string {
