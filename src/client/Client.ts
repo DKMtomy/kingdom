@@ -7,6 +7,7 @@ import { KingdomManager } from '../kingdom/KingdomManager';
 import { KingdomForm } from '../kingdom/KingdomForm';
 import { InventoryManager } from '../duels/invManager';
 import { WarpManager } from '../kingdom/warps';
+import { CommandHandler } from '../commandManager/index';
 
 class Client extends Emitter<CustomEventMap> {
   #name: string;
@@ -19,6 +20,7 @@ class Client extends Emitter<CustomEventMap> {
   readonly kingdomForm = new KingdomForm(this);
   readonly inventoryManager = new InventoryManager(this);
   readonly warpManager = new WarpManager(this);
+  readonly commandHandler = CommandHandler.getInstance(this);
 
   public constructor(name: string, version: string) {
     super();
