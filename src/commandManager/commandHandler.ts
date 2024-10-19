@@ -43,7 +43,11 @@ export class CommandHandler {
     const { message, sender } = event;
     if (!message.startsWith(this.prefix)) return;
 
-    const args = message.slice(this.prefix.length).trim().split(/\s+/);
+    event.cancel = true;
+
+    // Use a regular expression to split the message, preserving quoted sections
+    const argsWithCommand = message.slice(this.prefix.length).trim().match(/[^\s"]+|"([^"]*)"/g) || [];
+    const args = argsWithCommand.map(arg => arg.replace(/^"|"$/g, '')); // Remove surrounding quotes
     const commandName = args.shift()?.toLowerCase();
 
     if (!commandName) return;
@@ -51,7 +55,6 @@ export class CommandHandler {
     const command = this.commands.get(commandName);
     if (!command) {
       await this.client.sendMessage(`§cCommand not found: ${commandName}`, sender);
-      event.cancel = true;
       return;
     }
 

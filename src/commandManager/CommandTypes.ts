@@ -36,18 +36,60 @@ class PlayerType extends CommandArgumentType {
   name = 'player';
 
   parse(value: string): Player {
-    if (!value.startsWith('"') || !value.endsWith('"')) {
-      throw new Error(`Player name '${value}' must be enclosed in double quotes`);
-    }
-
-    const playerName = value.slice(1, -1); // Remove the surrounding double quotes
-    const player = world.getAllPlayers().find((p) => p.name.toLowerCase() === playerName.toLowerCase());
+    const player = world.getAllPlayers().find((p) => p.name.toLowerCase() === value.toLowerCase());
 
     if (!player) {
-      throw new Error(`Player '${playerName}' not found`);
+      throw new Error(`Player '${value}' not found`);
     }
 
     return player;
+  }
+}
+
+class DurationType extends CommandArgumentType {
+  name = 'duration';
+
+  parse(value: string) {
+    // Match durations with years, months (mo), weeks, days, hours, minutes, and seconds
+    const duration = value.match(/(\d+[ymwodhs])/g);
+    if (!duration) {
+      throw new Error(`'${value}' is not a valid duration`);
+    }
+    let total = 0;
+
+    for (const d of duration) {
+      // Extract the number and unit from the duration string for example 1y -> 1, y
+      const num = parseInt(d);
+      const unit = d.replace(num.toString(), '');
+      switch (unit) {
+
+        case 'y': // Years
+          total += num * 365 * 24 * 60 * 60; // Approximate, doesn't account for leap years
+          break;
+        case 'mo': // Months
+          total += num * 30 * 24 * 60 * 60; // Approximate, assumes 30 days per month
+          break;
+        case 'w': // Weeks
+          total += num * 7 * 24 * 60 * 60;
+          break;
+        case 'd': // Days
+          total += num * 24 * 60 * 60;
+          break;
+        case 'h': // Hours
+          total += num * 60 * 60;
+          break;
+        case 'm': // Minutes
+          total += num * 60;
+          break;
+        case 's': // Seconds
+          total += num;
+          break;
+        default:
+          throw new Error(`Unknown time unit: '${unit}'`);
+      }
+    }
+
+    return total;
   }
 }
 
@@ -56,4 +98,5 @@ export const CommandTypes = {
   Number: new NumberType(),
   Boolean: new BooleanType(),
   Player: new PlayerType(),
+  Duration: new DurationType(),
 };

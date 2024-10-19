@@ -31,13 +31,27 @@ export class AdminCommands extends BaseCommand {
           reason: [CommandTypes.String, true],
         },
         callback: async (player: Player, args: { player: Player; reason?: string }) => {
+
+          player.runCommandAsync(`kick "${args.player.name}" ${args.reason ? args.reason : ''}`);
+
           await CommandHandler.client.sendMessage(`Kicked player ${args.player.name} ${args.reason ? `for ${args.reason}` : ''}`, player);
+        },
+      } as SubcommandOptions<{ player: typeof CommandTypes.Player; reason: [typeof CommandTypes.String, true] }>,
+      mute : {
+        description: 'Mute a player',
+        schema: {
+          player: CommandTypes.Player,
+          duration: [CommandTypes.Duration, true],
+          reason: [CommandTypes.String, true],
+        },
+        callback: async (player: Player, args: { player: Player; duration?: number ;reason?: string }) => {
+          console.log(args)
         },
       } as SubcommandOptions<{ player: typeof CommandTypes.Player; reason: [typeof CommandTypes.String, true] }>,
     },
   })
   player(player: Player, args: any) {
-    // This method will not be called directly, but it's needed for the decorator
+    console.log(args)
   }
 
   @Command({
