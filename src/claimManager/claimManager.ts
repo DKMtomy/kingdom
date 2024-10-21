@@ -18,17 +18,35 @@ interface Claim {
   };
 }
 
+/**
+ * The `ClaimManager` class is responsible for managing land claims within a kingdom.
+ * It handles adding, removing, and querying claims, as well as maintaining a spatial index
+ * for efficient lookup of claims based on their location.
+ *
+ * @class ClaimManager
+ * @private
+ */
 class ClaimManager {
   private client: Client;
   private claims: Map<string, Claim> = new Map();
   private spatialIndex: Map<string, Set<string>> = new Map();
   private readonly indexResolution: number = 16;
 
+  /**
+   * @constructor
+   * @param {Client} client - The client instance used for communication.
+   */
   constructor(client: Client) {
     this.client = client;
     this.loadClaims();
   }
 
+  /**
+   * @method addClaim
+   * @param {string} kingdomId - The ID of the kingdom to which the claim belongs.
+   * @param {Vector2D[]} outline - The outline of the claim as an array of 2D vectors.
+   * @returns {string} - The unique ID of the newly added claim.
+   */
   public addClaim(kingdomId: string, outline: Vector2D[]): string {
     const id = this.generateUniqueId();
     const bounds = this.calculateBounds(outline);
@@ -41,6 +59,11 @@ class ClaimManager {
     return id;
   }
 
+  /**
+   * @method removeClaim
+   * @param {string} id - The ID of the claim to be removed.
+   * @returns {boolean} - True if the claim was successfully removed, false otherwise.
+   */
   public removeClaim(id: string): boolean {
     const claim = this.claims.get(id);
     if (!claim) return false;
@@ -51,6 +74,11 @@ class ClaimManager {
     return true;
   }
 
+  /**
+   * @method getClaimAt
+   * @param {Vector3} point - The 3D point to check for a claim.
+   * @returns {Claim | null} - The claim at the specified point, or null if no claim exists.
+   */
   public getClaimAt(point: Vector3): Claim | null {
     const cellKey = this.getCellKey(point);
     const potentialClaims = this.spatialIndex.get(cellKey) || new Set();
@@ -65,6 +93,11 @@ class ClaimManager {
     return null;
   }
 
+  /**
+   * @method getAdjacentClaims
+   * @param {string} claimId - The ID of the claim for which to find adjacent claims.
+   * @returns {Claim[]} - An array of adjacent claims.
+   */
   public getAdjacentClaims(claimId: string): Claim[] {
     const claim = this.claims.get(claimId);
     if (!claim) return [];
@@ -90,11 +123,25 @@ class ClaimManager {
     return adjacentClaims;
   }
 
+  /**
+   * @method isPointInClaim
+   * @private
+   * @param {Vector2D} point - The 2D point to check.
+   * @param {Claim} claim - The claim to check against.
+   * @returns {boolean} - True if the point is within the claim, false otherwise.
+   */
   private isPointInClaim(point: Vector2D, claim: Claim): boolean {
     if (!this.isPointInBounds(point, claim.bounds)) return false;
     return this.isPointInsidePolygon(point, claim.outline);
   }
 
+  /**
+   * @method isPointInBounds
+   * @private
+   * @param {Vector2D} point - The 2D point to check.
+   * @param {Claim['bounds']} bounds - The bounds of the claim.
+   * @returns {boolean} - True if the point is within the bounds, false otherwise.
+   */
   private isPointInBounds(point: Vector2D, bounds: Claim['bounds']): boolean {
     return (
       point.x >= bounds.minX && point.x <= bounds.maxX &&
@@ -102,6 +149,13 @@ class ClaimManager {
     );
   }
 
+  /**
+   * @method isPointInsidePolygon
+   * @private
+   * @param {Vector2D} point - The 2D point to check.
+   * @param {Vector2D[]} polygon - The polygon to check against.
+   * @returns {boolean} - True if the point is inside the polygon, false otherwise.
+   */
   private isPointInsidePolygon(point: Vector2D, polygon: Vector2D[]): boolean {
     let inside = false;
     for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
@@ -115,6 +169,12 @@ class ClaimManager {
     return inside;
   }
 
+  /**
+   * @method calculateBounds
+   * @private
+   * @param {Vector2D[]} outline - The outline of the claim.
+   * @returns {Claim['bounds']} - The calculated bounds of the claim.
+   */
   private calculateBounds(outline: Vector2D[]): Claim['bounds'] {
     let minX = Infinity, minZ = Infinity, maxX = -Infinity, maxZ = -Infinity;
 
@@ -128,6 +188,11 @@ class ClaimManager {
     return { minX, minZ, maxX, maxZ };
   }
 
+  /**
+   * @method updateSpatialIndex
+   * @private
+   * @param {Claim} claim - The claim to update in the spatial index.
+   */
   private updateSpatialIndex(claim: Claim): void {
     const cellKeys = this.getCellKeysForClaim(claim);
     for (const cellKey of cellKeys) {
@@ -138,6 +203,11 @@ class ClaimManager {
     }
   }
 
+  /**
+   * @method removeFromSpatialIndex
+   * @private
+   * @param {Claim} claim - The claim to remove from the spatial index.
+   */
   private removeFromSpatialIndex(claim: Claim): void {
     const cellKeys = this.getCellKeysForClaim(claim);
     for (const cellKey of cellKeys) {
@@ -151,6 +221,12 @@ class ClaimManager {
     }
   }
 
+  /**
+   * @method getCellKeysForClaim
+   * @private
+   * @param {Claim} claim - The claim for which to get cell keys.
+   * @returns {string[]} - An array of cell keys that the claim occupies.
+   */
   private getCellKeysForClaim(claim: Claim): string[] {
     const cellKeys = new Set<string>();
     const { minX, minZ, maxX, maxZ } = claim.bounds;
@@ -169,58 +245,41 @@ class ClaimManager {
     return Array.from(cellKeys);
   }
 
+  /**
+   * @method getCellKey
+   * @private
+   * @param {Vector3} point - The point for which to get the cell key.
+   * @returns {string} - The cell key.
+   */
   private getCellKey(point: Vector3): string {
-    const x = Math.floor(point.x / this.indexResolution);
-    const z = Math.floor(point.z / this.indexResolution);
-    return `${x}:${z}`;
+    const cellX = Math.floor(point.x / this.indexResolution);
+    const cellZ = Math.floor(point.z / this.indexResolution);
+    return `${cellX}:${cellZ}`;
   }
 
-  private areClaimsAdjacent(claim1: Claim, claim2: Claim): boolean {
-    // Check if any edge of claim1 intersects with any edge of claim2
-    for (let i = 0; i < claim1.outline.length; i++) {
-      const start1 = claim1.outline[i];
-      const end1 = claim1.outline[(i + 1) % claim1.outline.length];
-
-      for (let j = 0; j < claim2.outline.length; j++) {
-        const start2 = claim2.outline[j];
-        const end2 = claim2.outline[(j + 1) % claim2.outline.length];
-
-        if (this.doLineSegmentsIntersect(start1, end1, start2, end2)) {
-          return true;
-        }
-      }
-    }
-    return false;
+  /**
+   * @method areClaimsAdjacent
+   * @private
+   * @param {Claim} claimA - The first claim.
+   * @param {Claim} claimB - The second claim.
+   * @returns {boolean} - True if the claims are adjacent, false otherwise.
+   */
+  private areClaimsAdjacent(claimA: Claim, claimB: Claim): boolean {
+    return (
+      claimA.bounds.maxX >= claimB.bounds.minX &&
+      claimA.bounds.minX <= claimB.bounds.maxX &&
+      claimA.bounds.maxZ >= claimB.bounds.minZ &&
+      claimA.bounds.minZ <= claimB.bounds.maxZ
+    );
   }
 
-  private doLineSegmentsIntersect(p1: Vector2D, p2: Vector2D, p3: Vector2D, p4: Vector2D): boolean {
-    const d1 = this.direction(p3, p4, p1);
-    const d2 = this.direction(p3, p4, p2);
-    const d3 = this.direction(p1, p2, p3);
-    const d4 = this.direction(p1, p2, p4);
-
-    if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) &&
-        ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) {
-      return true;
-    }
-
-    return d1 === 0 && this.onSegment(p3, p4, p1) ||
-           d2 === 0 && this.onSegment(p3, p4, p2) ||
-           d3 === 0 && this.onSegment(p1, p2, p3) ||
-           d4 === 0 && this.onSegment(p1, p2, p4);
-  }
-
-  private direction(p1: Vector2D, p2: Vector2D, p3: Vector2D): number {
-    return (p3.x - p1.x) * (p2.z - p1.z) - (p2.x - p1.x) * (p3.z - p1.z);
-  }
-
-  private onSegment(p1: Vector2D, p2: Vector2D, p3: Vector2D): boolean {
-    return Math.min(p1.x, p2.x) <= p3.x && p3.x <= Math.max(p1.x, p2.x) &&
-           Math.min(p1.z, p2.z) <= p3.z && p3.z <= Math.max(p1.z, p2.z);
-  }
-
+  /**
+   * @method generateUniqueId
+   * @private
+   * @returns {string} - A unique identifier.
+   */
   private generateUniqueId(): string {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 
   private saveClaims(): void {

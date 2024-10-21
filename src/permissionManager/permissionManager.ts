@@ -12,8 +12,6 @@ enum PermissionBits {
   Mute = 1 << 6,
   Vanish = 1 << 7,
   Teleport = 1 << 8,
-
-  // Add more permissions as needed
 }
 
 enum Role {
