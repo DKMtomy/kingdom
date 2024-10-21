@@ -4,6 +4,7 @@ import './poly.js';
 import { Player } from './Player/Player.js';
 import { EnhancedActionFormData } from './kingdom/form.js';
 import { AdminCommands } from './commands/AdminCommands.js';
+import { PermissionBits, Role } from './permissionManager/permissionManager.js';
 
 const client = new Client('WKD', '1.0.0');
 
@@ -54,6 +55,42 @@ world.beforeEvents.itemUse.subscribe((event) => {
   });
 });
 
+world.beforeEvents.playerPlaceBlock.subscribe((event) => {
+  let loc = client.claimManager.getClaimAt(event.block.location);
+
+  if (!loc) return console.log('No claim found');
+
+  event.player.sendMessage(`§cJe kan hier niet bouwen, dit is een claim van ${loc.kingdomId}`);
+  event.cancel = true;
+})
+
+world.beforeEvents.playerBreakBlock.subscribe((event) => {
+  let loc = client.claimManager.getClaimAt(event.block.location);
+
+  if (!loc) return console.log('No claim found');
+
+  event.player.sendMessage(`§cJe kan hier niet breken, dit is een claim van ${loc.kingdomId}`);
+  event.cancel = true;
+})
+
+world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
+  let loc = client.claimManager.getClaimAt(event.block.location);
+
+  if (!loc) return console.log('No claim found');
+
+  event.player.sendMessage(`§cJe kan hier niet interacten, dit is een claim van ${loc.kingdomId}`);
+  event.cancel = true;
+});
+
+world.beforeEvents.explosion.subscribe((event) => {
+  let blocks = event.getImpactedBlocks();
+  let blocksToKeep = blocks.filter((block) => {
+    let loc = client.claimManager.getClaimAt(block.location);
+    return !loc;
+  });
+  event.setImpactedBlocks(blocksToKeep);
+});
+
 world.beforeEvents.chatSend.subscribe((event) => {
   const player = new Player(event.sender);
 
@@ -67,6 +104,15 @@ world.beforeEvents.chatSend.subscribe((event) => {
         client.inventoryManager.restoreInventory(player);
       });
       break;
+
+      case 'test3':
+        system.run(() => {
+          client.permissions.assignRole(event.sender, Role.Admin);
+        })
+        break;
+
+        case 'test4':
+          break;
   }
 });
 

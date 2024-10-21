@@ -23,6 +23,7 @@ export interface CommandOptions<T extends CommandSchema = any> {
   schema?: T;
   category?: string;
   subcommands?: Record<string, SubcommandOptions<T>>;
+  permission?: (player: Player) => boolean;
 }
 
 export interface SubcommandOptions<T extends CommandSchema = any> {

@@ -9,7 +9,7 @@ export class CommandHandler {
   private static instance: CommandHandler;
   public static client: Client;
   private commands: Map<string, Command<any>> = new Map();
-  private prefix: string = '!';
+  private prefix: string = '-';
 
   private constructor(private client: Client) {
     world.beforeEvents.chatSend.subscribe(this.handleChat.bind(this));
@@ -98,7 +98,7 @@ export class CommandHandler {
     );
   }
 
-  private async showCommandHelp(player: Player, commandName: string) {
+  public async showCommandHelp(player: Player, commandName: string) {
     const command = this.commands.get(commandName.toLowerCase());
     if (command) {
       const usage = command.generateUsage(this.prefix);

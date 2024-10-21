@@ -1,4 +1,4 @@
-import { world, Player } from '@minecraft/server';
+import { world, Player, Vector3 } from '@minecraft/server';
 
 export abstract class CommandArgumentType {
   abstract name: string;
@@ -29,6 +29,18 @@ class BooleanType extends CommandArgumentType {
     if (value.toLowerCase() === 'true') return true;
     if (value.toLowerCase() === 'false') return false;
     throw new Error(`'${value}' is not a valid boolean (use 'true' or 'false')`);
+  }
+}
+
+class Vec3Type extends CommandArgumentType {
+  name = 'vec3';
+  parse(value: string): Vector3 {
+    const vec = value.split(' ');
+    if (vec.length !== 3) {
+      throw new Error(`'${value}' is not a valid Vec3`);
+    }
+
+    return { x: Number(vec[0]), y: Number(vec[1]), z: Number(vec[2]) };
   }
 }
 
@@ -99,4 +111,5 @@ export const CommandTypes = {
   Boolean: new BooleanType(),
   Player: new PlayerType(),
   Duration: new DurationType(),
+  Vec3: new Vec3Type(),
 };

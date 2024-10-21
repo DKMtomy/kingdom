@@ -1,6 +1,7 @@
-import { Player } from '@minecraft/server';
+import { Player, system } from '@minecraft/server';
 import { CommandSchema, CommandOptions, CommandCallback, InferSchemaType, SubcommandOptions } from './types';
 import { CommandError } from './CommandError';
+import { CommandHandler } from './commandHandler';
 
 export class Command<T extends CommandSchema = any> {
   public subcommands: Map<string, Command<any>> = new Map();
@@ -22,16 +23,25 @@ export class Command<T extends CommandSchema = any> {
   }
 
   async execute(player: Player, args: string[]): Promise<void> {
-    if (this.subcommands.size > 0 && args.length > 0) {
-      const subcommandName = args[0].toLowerCase();
-      const subcommand = this.subcommands.get(subcommandName);
-      if (subcommand) {
-        return subcommand.execute(player, args.slice(1));
+    system.run(async () => {
+      // Permission check before executing the command
+      if (this.options.permission && !this.options.permission(player)) {
+        // Handle permission denied (e.g., send message to player or log)
+        CommandHandler.client.sendMessage(`§cYou don't have permission to use this command.`, player);
+        throw new CommandError(`You don't have permission to use this command.`);
       }
-    }
 
-    const parsedArgs = this.parseArgs(args);
-    await this.callback(player, parsedArgs);
+      if (this.subcommands.size > 0 && args.length > 0) {
+        const subcommandName = args[0].toLowerCase();
+        const subcommand = this.subcommands.get(subcommandName);
+        if (subcommand) {
+          return subcommand.execute(player, args.slice(1));
+        }
+      }
+
+      const parsedArgs = this.parseArgs(args);
+      await this.callback(player, parsedArgs);
+    })
   }
 
   private parseArgs(args: string[]): InferSchemaType<T> {

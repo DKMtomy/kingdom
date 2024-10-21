@@ -8,6 +8,8 @@ import { KingdomForm } from '../kingdom/KingdomForm';
 import { InventoryManager } from '../duels/invManager';
 import { WarpManager } from '../kingdom/warps';
 import { CommandHandler } from '../commandManager/index';
+import { PermissionManager } from '../permissionManager/index';
+import { ClaimManager } from '../claimManager/index';
 
 class Client extends Emitter<CustomEventMap> {
   #name: string;
@@ -21,6 +23,8 @@ class Client extends Emitter<CustomEventMap> {
   readonly inventoryManager = new InventoryManager(this);
   readonly warpManager = new WarpManager(this);
   readonly commandHandler = CommandHandler.getInstance(this);
+  readonly permissions = new PermissionManager(this);
+  readonly claimManager = new ClaimManager(this);
 
   public constructor(name: string, version: string) {
     super();
