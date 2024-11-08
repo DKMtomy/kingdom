@@ -1,4 +1,4 @@
-// Declare console for this environment
+// @ts-expect-error Declare console for this environment
 declare const console: {
   warn: (...data: any[]) => void;
   error: (...data: any[]) => void;

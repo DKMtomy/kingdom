@@ -1,5 +1,5 @@
 import { Entity } from '../Entity/index';
-import { Container, Dimension, EntityEquippableComponent, EntityInventoryComponent, EquipmentSlot, Player as IPlayer, ItemStack, Vector3, world } from '@minecraft/server';
+import { Container, Dimension, EntityEquippableComponent, EntityInventoryComponent, EquipmentSlot, Player as IPlayer, ItemStack, PlatformType, Vector3, world } from '@minecraft/server';
 
 class Player extends Entity {
   #player: IPlayer;
@@ -15,6 +15,10 @@ class Player extends Entity {
 
   get player(): IPlayer {
     return this.#player;
+  }
+
+  get device(): PlatformType {
+    return this.#player.clientSystemInfo.platformType;
   }
 
   get hasApiRequest(): boolean {
