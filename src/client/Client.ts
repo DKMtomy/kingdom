@@ -9,7 +9,7 @@ import { InventoryManager } from '../duels/invManager';
 import { WarpManager } from '../kingdom/warps';
 import { CommandHandler } from '../commandManager/index';
 import { PermissionManager } from '../permissionManager/index';
-import { ClaimManager } from '../claimManager/index';
+import { ClaimManager } from '../claimManager/claimManager';
 
 class Client extends Emitter<CustomEventMap> {
   #name: string;

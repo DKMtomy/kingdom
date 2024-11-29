@@ -1,0 +1,24 @@
+world.beforeEvents.chatSend.subscribe((event) => {
+  const player = new Player(event.sender);
+
+  switch (event.message) {
+    case 'test':
+      system.run(() => client.inventoryManager.sortInventory(player));
+      break;
+    case 'test2':
+      system.run(() => {
+        client.inventoryManager.restoreEquipmentAndHotbar(player);
+        client.inventoryManager.restoreInventory(player);
+      });
+      break;
+
+      case 'test3':
+        system.run(() => {
+          client.permissions.assignRole(event.sender, Role.Admin);
+        })
+        break;
+
+        case 'test4':
+          break;
+  }
+});
